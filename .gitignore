@@ -25,3 +25,6 @@ Thumbs.db
 # Build files
 dist/
 build/
+
+# Temporary assets
+temp_images/
