@@ -6,6 +6,7 @@
     <title>AbhiRam's Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Clash+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=Playball&family=Poppins:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>    <!-- Loading Screen -->
     <div id="loading-screen">
@@ -362,15 +363,15 @@
             <div class="contact-form">
                 <form>
                     <div class="form-group">
-                        <input type="text" placeholder="Your Name" required>
+                        <input type="text" name="name" placeholder="Your Name" required>
                         <div class="form-line"></div>
                     </div>
                     <div class="form-group">
-                        <input type="email" placeholder="Your Email" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
                         <div class="form-line"></div>
                     </div>
                     <div class="form-group">
-                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
                         <div class="form-line"></div>
                     </div>
                     <button type="submit" class="submit-button">

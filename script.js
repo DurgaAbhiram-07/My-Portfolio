@@ -324,6 +324,11 @@ class FormHandler {
         });
 
         if (isValid) {
+            const submitButton = this.form.querySelector('button[type="submit"]');
+            const originalText = submitButton.querySelector('span').textContent;
+            submitButton.querySelector('span').textContent = 'Sending...';
+            submitButton.disabled = true;
+
             try {
                 // Get form data
                 const formData = new FormData(this.form);
@@ -352,7 +357,10 @@ class FormHandler {
                 }
             } catch (error) {
                 console.error('Form submission error:', error);
-                this.showErrorMessage('Failed to send message. Please try again.');
+                this.showErrorMessage('Server connection failed. Please email directly at abhirampulicharla414@gmail.com');
+            } finally {
+                submitButton.querySelector('span').textContent = originalText;
+                submitButton.disabled = false;
             }
         }
     }
@@ -397,17 +405,19 @@ class FormHandler {
         message.style.color = '#fff';
         message.style.padding = '1rem 2rem';
         message.style.borderRadius = '50px';
-        message.style.fontSize = '1rem';
+        message.style.fontSize = '0.9rem';
         message.style.fontWeight = '600';
         message.style.zIndex = '10000';
         message.style.animation = 'slideInRight 0.5s ease-out';
+        message.style.maxWidth = '400px';
+        message.style.textAlign = 'center';
         
         document.body.appendChild(message);
         
         setTimeout(() => {
             message.style.animation = 'slideOutRight 0.5s ease-out';
             setTimeout(() => message.remove(), 500);
-        }, 4000);
+        }, 6000);
     }
 }
 
