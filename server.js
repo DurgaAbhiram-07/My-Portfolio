@@ -26,18 +26,36 @@ const contactLimiter = rateLimit({
 });
 
 // Email transporter configuration
-const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE || 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
+let transporter;
+
+if (process.env.EMAIL_SERVICE === 'gmail') {
+    // Gmail with App Password
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+} else {
+    // Generic SMTP configuration
+    transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT || 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+}
 
 // Verify transporter connection
 transporter.verify((error, success) => {
     if (error) {
-        console.error('❌ Email transporter error:', error);
+        console.error('❌ Email transporter error:', error.message);
+        console.error('   Make sure your email credentials are correct');
+        console.error('   For Gmail: Use an App Password, not your regular password');
     } else if (success) {
         console.log('✅ Email transporter ready to send messages');
     }
@@ -48,6 +66,33 @@ transporter.verify((error, success) => {
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
+});
+
+// Test email configuration
+app.get('/api/test-email', async (req, res) => {
+    try {
+        const testMail = {
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
+            subject: 'Portfolio Test Email',
+            html: '<h2>Test Email</h2><p>If you received this, your email configuration is working!</p>'
+        };
+        
+        await transporter.sendMail(testMail);
+        res.json({ 
+            success: true, 
+            message: 'Test email sent successfully!',
+            email: process.env.EMAIL_USER
+        });
+    } catch (error) {
+        console.error('Test email error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Test email failed',
+            error: error.message,
+            code: error.code
+        });
+    }
 });
 
 // Submit contact form
@@ -120,12 +165,23 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
             ]);
             console.log(`✓ Emails sent successfully for: ${name} (${email})`);
         } catch (emailError) {
-            console.error('❌ Email sending error:', emailError);
-            console.error('Error message:', emailError.message);
+            console.error('❌ Email sending error:', emailError.message);
             console.error('Error code:', emailError.code);
+            console.error('Error details:', emailError);
+            
+            // Provide specific error messages based on error type
+            let errorMessage = 'Failed to send email. Please try again later.';
+            if (emailError.code === 'EAUTH') {
+                errorMessage = 'Email authentication failed. Check your email credentials.';
+            } else if (emailError.message.includes('Invalid login') || emailError.message.includes('535')) {
+                errorMessage = 'Invalid email credentials. For Gmail, use an App Password.';
+            } else if (emailError.message.includes('getaddrinfo')) {
+                errorMessage = 'Email server connection failed. Check your internet connection.';
+            }
+            
             return res.status(500).json({ 
                 success: false, 
-                message: 'Failed to send email. Please try again later.' 
+                message: errorMessage
             });
         }
 
