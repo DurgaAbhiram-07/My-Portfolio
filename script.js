@@ -524,7 +524,9 @@ document.addEventListener('DOMContentLoaded', () => {
     new CounterAnimation();
     new NavbarAnimation();
     new FormHandler();
-    new CursorFollow();
+    if (window.matchMedia('(pointer: fine)').matches) {
+        new CursorFollow();
+    }
 
     // Easter egg animation
     let clickCount = 0;
