@@ -1440,7 +1440,8 @@ button, a {
     }
 
     .portrait-img {
-        max-width: 280px;
+        max-width: 90vw;
+        height: auto;
     }
 
     .stats {
@@ -1581,13 +1582,14 @@ button, a {
     }
 
     .portrait-photo {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 1rem;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto 1rem auto;
     }
 
     .portrait-img {
-        max-width: 200px;
+        max-width: 100%;
+        height: auto;
     }
 
     .stats {
